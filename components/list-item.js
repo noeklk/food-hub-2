@@ -1,43 +1,35 @@
 import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Image, TouchableHighlight } from 'react-native';
+import { View, TouchableOpacity, Text } from 'react-native';
+import { ListItem as ReactListItem } from "react-native-elements";
 
+import GradeRender from "./grade-render";
 
-export default class ListItem extends React.Component {
+const ListItem = (props) => {
 
-    constructor(props) {
-        super(props);
-        this.state = {};
-    }
+    const { item } = props;
+    const { navigation } = props;
 
-
-    _onPress = (item) => {
-        this.props.navigation.navigate('Item',
+    const _onPress = (item) => {
+        navigation.navigate('Item',
             {
                 product: item
             }
         )
     }
 
-    render = () => {
-        return (
-            <View>
-                <TouchableOpacity onPress={() => this._onPress(this.props.item)}>
-                    <View style={{
-                        height: 100, backgroundColor: "white", borderColor: "black", borderWidth: 1, borderRadius: 5, marginBottom: 5,
-                        flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'
-                    }}>
-
-                        <Image
-                            source={{ uri: this.props.item.image_small_url }}
-                            style={{ width: 70, height: 70, borderRadius: 70, marginLeft: 5 }}
-                        />
-
-                        <Text style={{ fontSize: 18, marginRight: 5 }}>{this.props.item.product_name}</Text>
-                    </View>
-
-                </TouchableOpacity>
-            </View>
-        )
-    }
-
+    return (
+        <View>
+            <TouchableOpacity onPress={() => _onPress(item)}>
+                <ReactListItem
+                    leftAvatar={{ source: { uri: item.image_small_url }, size: "large" }}
+                    title={item.product_name}
+                    subtitle={<GradeRender size={14} grade={item.grade} />}
+                    bottomDivider
+                    chevron
+                />
+            </TouchableOpacity>
+        </View>
+    )
 }
+
+export default ListItem;

@@ -1,57 +1,57 @@
-import React from "react";
-import { SafeAreaView, FlatList, ActivityIndicator, View, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from "react";
+import { SafeAreaView, FlatList, ActivityIndicator, View, Text, Button } from 'react-native';
 
 import ListItem from "../components/list-item";
 
-import { fetchFiveRandomProducts } from "../services/food-fact";
+import { fetchFiveRandomProducts, MAX_PRODUCT_RESULT } from "../services/food-fact";
 
-export default class Home extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            products: [],
-            loading: true,
-        };
+const Home = (props) => {
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [update, setUpdate] = useState(false);
+
+    const updateHandler = () => {
+        setUpdate(!update);
     }
 
-    async componentDidMount() {
-        let products = await fetchFiveRandomProducts();
-        this.setState({ products: products, loading: false });
+    useEffect(() => {
+        (async () => {
+            let products = await fetchFiveRandomProducts();
+            setProducts(products);
+            setLoading(false);
+        })()
+    }, [update]);
+
+    if (loading) {
+        return (
+            <SafeAreaView style={{ flex: 1, padding: 20 }}>
+                <View>
+                    <ActivityIndicator />
+                </View>
+            </SafeAreaView>
+        )
+    }
+    else {
+        return (
+            <SafeAreaView style={{
+                flex: 1,
+                flexDirection: 'column',
+                justifyContent: 'flex-end'
+            }}>
+                <Text style={{ textAlign: "center", fontSize: 25, backgroundColor: "#2196F3", color: "white", height: 35 }}>{MAX_PRODUCT_RESULT} produits au hasard à découvrir</Text>
+                <FlatList
+                    keyExtractor={(item, i) => i.toString()}
+                    data={products}
+                    renderItem={({ item }) =>
+                        < ListItem item={item} navigation={props.navigation} />
+                    }
+                />
+                <Button title="Rafraîchir" onPress={() => updateHandler()} />
+            </SafeAreaView>
+        );
     }
 
-    render = () => {
-        if (this.state.loading) {
-            return (
-                <SafeAreaView style={{ flex: 1, padding: 20 }}>
-                    <View>
-                        <ActivityIndicator />
-                    </View>
-                </SafeAreaView>
-            )
-        }
-        else {
-            return (
-                <SafeAreaView style={styles.container}>
-                    <FlatList
-                        data={this.state.products}
-                        renderItem={({ item }) => <ListItem item={item} navigation={this.props.navigation} />}
-                        keyExtractor={({ id }, index) => id}
-                    />
-                </SafeAreaView>
-            );
-        }
-    }
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        width: "100%",
-        alignItems: "center",
-        padding: 5,
-        justifyContent: "center",
-        height: "100%",
-        flexDirection: "row",
-        backgroundColor: "lightgrey"
-    }
-});
+export default Home;
+

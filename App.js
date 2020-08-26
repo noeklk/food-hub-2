@@ -1,6 +1,6 @@
 import 'react-native-gesture-handler';
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -10,85 +10,86 @@ import { Icon } from 'react-native-elements';
 import Home from './static/home';
 import History from './static/history';
 import Scanner from './static/scanner';
-import Item from './static/item';
-
-import { fetchFiveRandomProducts } from "./services/food-fact";
+import ItemDetails from './static/item-details';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const HomeStack = () => {
   return (
-    <Stack.Navigator>
-      <Stack.Screen name="Home" component={Home} />
-      <Stack.Screen name="Item" component={Item} />
+    <Stack.Navigator screenOptions={{
+      headerTintColor: 'white',
+      headerStyle: { backgroundColor: '#63954b' },
+      headerTitleAlign: "center"
+
+    }}>
+      <Stack.Screen options={{ title: "Accueil" }} name="Home" component={Home} />
+      <Stack.Screen options={{ title: "Produit" }} name="Item" component={ItemDetails} />
     </Stack.Navigator>
   )
 }
 
 const ScannerStack = () => {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator screenOptions={{
+      headerTintColor: 'white',
+      headerStyle: { backgroundColor: '#63954b' },
+      headerTitleAlign: "center"
+    }}>
       <Stack.Screen name="Scanner" component={Scanner} />
-      <Stack.Screen name="Item" component={Item} />
+      <Stack.Screen options={{ title: "Produit" }} name="Item" component={ItemDetails} />
     </Stack.Navigator>
   )
 }
 
 const HistoryStack = () => {
   return (
-    <Stack.Navigator>
-      <Stack.Screen name="History" component={History} />
-      <Stack.Screen name="Item" component={Item} />
+    <Stack.Navigator screenOptions={{
+      headerTintColor: 'white',
+      headerStyle: { backgroundColor: '#63954b' },
+      headerTitleAlign: "center"
+    }}>
+      <Stack.Screen options={{ title: "Historique" }} name="History" component={History} />
+      <Stack.Screen options={{ title: "Produit" }} name="Item" component={ItemDetails} />
     </Stack.Navigator>
   )
 }
 
-export default class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { products: [] };
-  }
+export default function App() {
 
-  // 3274080005003 Cristaline
+  return (
+    <NavigationContainer>
+      <Tab.Navigator>
+        <Tab.Screen
+          name="Home"
+          component={HomeStack}
+          options={{
+            tabBarLabel: "Accueil",
+            tabBarIcon: () => <Icon name="home" size={24} type="font-awesome" />,
 
-  async componentDidMount() {
-    await fetchFiveRandomProducts();
-  }
+          }}
+        />
+        <Tab.Screen
+          name="Scanner"
+          component={ScannerStack}
+          options={{
+            tabBarLabel: "Scanner",
+            tabBarIcon: () => <Icon name="search" size={24} type="font-awesome" />,
+          }}
+        />
 
-  render = () => {
-    return (
-      <NavigationContainer>
-        <Tab.Navigator>
-          <Tab.Screen
-            name="Home"
-            component={HomeStack}
-            options={{
-              tabBarLabel: 'Accueil',
-              tabBarIcon: () => <Icon name="home" size={24} type="font-awesome" />,
-            }}
-          />
-          <Tab.Screen
-            name="Scanner"
-            component={ScannerStack}
-            options={{
-              tabBarLabel: 'Scanner',
-              tabBarIcon: () => <Icon name="search" size={24} type="font-awesome" />,
-            }}
-          />
-
-          <Tab.Screen
-            name="History"
-            component={HistoryStack}
-            options={{
-              tabBarLabel: 'Historique',
-              tabBarIcon: () => <Icon name="history" size={24} type="font-awesome" />,
-            }}
-          />
-        </Tab.Navigator>
-      </NavigationContainer>
-    );
-  }
+        <Tab.Screen
+          name="History"
+          component={HistoryStack}
+          options={{
+            tabBarBadge: 1,
+            tabBarLabel: 'Historique',
+            tabBarIcon: () => <Icon name="history" size={24} type="font-awesome" />,
+          }}
+        />
+      </Tab.Navigator>
+    </NavigationContainer>
+  );
 
 }
 
