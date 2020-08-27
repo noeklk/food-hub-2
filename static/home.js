@@ -16,29 +16,27 @@ const Home = (props) => {
 
     useEffect(() => {
         (async () => {
+            setLoading(true);
             let products = await fetchFiveRandomProducts();
             setProducts(products);
             setLoading(false);
         })()
     }, [update]);
 
-    if (loading) {
-        return (
-            <SafeAreaView style={{ flex: 1, padding: 20 }}>
-                <View>
-                    <ActivityIndicator />
-                </View>
-            </SafeAreaView>
-        )
-    }
-    else {
-        return (
-            <SafeAreaView style={{
-                flex: 1,
-                flexDirection: 'column',
-                justifyContent: 'flex-end'
-            }}>
-                <Text style={{ textAlign: "center", fontSize: 25, backgroundColor: "#2196F3", color: "white", height: 35 }}>{MAX_PRODUCT_RESULT} produits au hasard à découvrir</Text>
+    return (
+        <SafeAreaView style={{
+            flex: 1,
+            flexDirection: 'column',
+            justifyContent: 'flex-end'
+        }}>
+            <Text style={{ textAlign: "center", fontSize: 25, backgroundColor: "#2196F3", color: "white", height: 35 }}>{MAX_PRODUCT_RESULT} produits au hasard à découvrir</Text>
+            {loading ?
+                <SafeAreaView style={{ flex: 1, padding: 20 }}>
+                    <View>
+                        <ActivityIndicator />
+                    </View>
+                </SafeAreaView>
+                :
                 <FlatList
                     keyExtractor={(item, i) => i.toString()}
                     data={products}
@@ -46,10 +44,12 @@ const Home = (props) => {
                         < ListItem item={item} navigation={props.navigation} />
                     }
                 />
-                <Button title="Rafraîchir" onPress={() => updateHandler()} />
-            </SafeAreaView>
-        );
-    }
+            }
+
+            <Button title="Rafraîchir" onPress={() => updateHandler()} />
+        </SafeAreaView>
+    );
+
 
 }
 

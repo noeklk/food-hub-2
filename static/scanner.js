@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Button, Platform } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Button, AsyncStorage } from "react-native";
 import { Camera } from 'expo-camera';
 import { Icon } from 'react-native-elements';
 
@@ -16,6 +16,12 @@ const Scanner = (props) => {
     const [torch, setTorch] = useState(Camera.Constants.FlashMode.off);
     const [notValidProductMessage, setNotValidProductMessage] = useState(null);
     const [errorMessageToggle, setErrorMessageToggle] = useState(false);
+
+    const torchOff = Camera.Constants.FlashMode.off;
+    const torchOn = Camera.Constants.FlashMode.torch;
+    const setTorchOff = () => setTorch(torchOff);
+    const setTorchOn = () => setTorch(torchOn);
+    const torchHandler = () => torch === torchOff ? setTorchOn() : setTorchOff();
 
     props.navigation.addListener('blur', () => {
         setTorchOff();
@@ -38,10 +44,11 @@ const Scanner = (props) => {
         // alert(`Bar code with type ${type} and data ${data} has been scanned!`);
 
         const product = await fetchDataByBarCode(data);
-        console.log(product);
 
         if (product.status === 1) {
             setProduct(product);
+            await _storeData(product);
+
         } else if (product.status === 0) {
             setNotValidProductMessage(product.message);
             setErrorMessageToggle(true);
@@ -62,21 +69,36 @@ const Scanner = (props) => {
         )
     };
 
-    const torchOff = Camera.Constants.FlashMode.off;
-    const torchOn = Camera.Constants.FlashMode.torch;
+    const checkDoesNotContainsData = (persistingData, inputData) => {
+        for (let i = 0; i < persistingData.length; i++) {
+            if (persistingData[i].code == inputData.code) {
+                return false;
+            }
+        }
 
-    const setTorchOff = () => {
-        setTorch(torchOff);
-    }
-    const setTorchOn = () => {
-        setTorch(torchOn);
+        return true;
     }
 
-    const torchHandler = () => {
-        if (torch === torchOff) {
-            setTorchOn();
-        } else {
-            setTorchOff();
+    const _storeData = async (inputData) => {
+        try {
+            const persistingData = await AsyncStorage.getItem("data");
+
+            if (persistingData == null) {
+                await AsyncStorage.setItem("data", JSON.stringify([inputData]));
+                return;
+            }
+
+            const jsonParse = JSON.parse(persistingData);
+
+            if (checkDoesNotContainsData(jsonParse, inputData)) {
+                jsonParse.push(inputData);
+                let jsonStringify = JSON.stringify(jsonParse)
+
+                await AsyncStorage.setItem("data", jsonStringify);
+            }
+        }
+        catch (e) {
+            console.log(e);
         }
     }
 
@@ -109,24 +131,21 @@ const Scanner = (props) => {
                         style={{
                             position: "absolute",
                             width: "25%",
-                            // height: 50
                             bottom: "15%",
                             alignSelf: "center"
                         }}>
                         <TouchableOpacity
+                            activeOpacity={0.9}
+
                             onPress={() => torchHandler()}>
-                            {torch === torchOn ?
-                                <Icon name="flash" backgroundColor={"white"} borderRadius={50} size={100} type="font-awesome" />
-                                :
-                                <Icon name="flash" backgroundColor={"rgba(211,211,211, 0.4);"} borderRadius={50} size={100} type="font-awesome" />
-                            }
+                            <Icon name="flash" backgroundColor={torch === torchOn ? "white" : "rgba(211,211,211, 0.4);"} borderRadius={50} size={100} type="font-awesome" />
                         </TouchableOpacity>
                     </View>
                 </Camera>}
 
             {(scanned && !errorMessageToggle) && <Button title={"Voir le produit scanné"} onPress={() => handleViewProduct(false)} />}
             {scanned && <Button title={"Appuyer pour scanner encore"} onPress={() => setScanned(false)} />}
-            {(errorMessageToggle && scanned) && <Button title={notValidProductMessage} color="tomato" onPress={() => setScanned(false)} />}
+            {(errorMessageToggle && scanned) && <Button disabled={true} title={notValidProductMessage} color="tomato" onPress={() => setScanned(false)} />}
         </View>
     );
 

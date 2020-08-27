@@ -1,6 +1,3 @@
-
-export const MAX_PRODUCT_RESULT = 13;
-
 export async function fetchDataByBarCode(barCode) {
     try {
         const response = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barCode}.json`);
@@ -39,18 +36,20 @@ function getTwoRandomLetters() {
     return result;
 }
 
-export async function fetchFiveRandomProducts() {
+export const MAX_PRODUCT_RESULT = 10;
+
+export async function fetchFiveRandomProducts(pageSize = MAX_PRODUCT_RESULT) {
     const dataList = [];
 
     let products;
     let validCase = 0;
 
     try {
-        // boucle infinie jusqu'à que le fetch retourne au moins 5 résultats avec en entrée 2 lettres au hasard
-        // et que les 5 premiers résultat n'ai pas un product_name ou image_small_url de null
-        // ps: ce fetch nous retourne obligatoirement 20 résultats
+        // boucle infinie jusqu'à que le fetch retourne au moins MAX_PRODUCT_RESULT résultats avec en entrée 2 lettres au hasard
+        // et que les MAX_PRODUCT_RESULT premiers résultat n'ai pas un product_name ou image_small_url de null
+        // ps: ce fetch nous retourne obligatoirement au moins MAX_PRODUCT_RESULT
         do {
-            let response = await fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${getTwoRandomLetters()}&search_simple=1&page_size=20&json=true`);
+            let response = await fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${getTwoRandomLetters()}&search_simple=1&page_size=${pageSize}&json=true`);
             let responseJson = await response.json();
 
             for (let i = 0; i < MAX_PRODUCT_RESULT; i++) {
