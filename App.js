@@ -1,12 +1,12 @@
 import 'react-native-gesture-handler';
-import { StatusBar } from 'expo-status-bar';
+import * as eva from '@eva-design/eva';
 import React, { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Icon } from 'react-native-elements';
-
+import { ApplicationProvider } from '@ui-kitten/components';
 import Home from './static/home';
 import History from './static/history';
 import Scanner from './static/scanner';
@@ -18,7 +18,7 @@ const Tab = createBottomTabNavigator();
 const HomeStack = () => {
   return (
     <Stack.Navigator screenOptions={{
-      headerTintColor: 'white',
+      headerTintColor: "white",
       headerStyle: { backgroundColor: '#63954b' },
       headerTitleAlign: "center"
 
@@ -32,8 +32,8 @@ const HomeStack = () => {
 const ScannerStack = () => {
   return (
     <Stack.Navigator screenOptions={{
-      headerTintColor: 'white',
-      headerStyle: { backgroundColor: '#63954b' },
+      headerTintColor: "white",
+      headerStyle: { backgroundColor: "#63954b" },
       headerTitleAlign: "center"
     }}>
       <Stack.Screen name="Scanner" component={Scanner} />
@@ -45,7 +45,7 @@ const ScannerStack = () => {
 const HistoryStack = () => {
   return (
     <Stack.Navigator screenOptions={{
-      headerTintColor: 'white',
+      headerTintColor: "white",
       headerStyle: { backgroundColor: '#63954b' },
       headerTitleAlign: "center"
     }}>
@@ -58,37 +58,38 @@ const HistoryStack = () => {
 export default function App() {
 
   return (
-    <NavigationContainer>
-      <Tab.Navigator>
-        <Tab.Screen
-          name="Home"
-          component={HomeStack}
-          options={{
-            tabBarLabel: "Accueil",
-            tabBarIcon: () => <Icon name="home" size={24} type="font-awesome" />,
+    <ApplicationProvider {...eva} theme={eva.light}>
+      <NavigationContainer>
+        <Tab.Navigator>
+          <Tab.Screen
+            name="Home"
+            component={HomeStack}
+            options={{
+              tabBarLabel: "Accueil",
+              tabBarIcon: () => <Icon name="home" size={24} type="font-awesome" />,
+            }}
+          />
+          <Tab.Screen
+            name="Scanner"
+            component={ScannerStack}
+            options={{
+              tabBarLabel: "Scanner",
+              tabBarIcon: () => <Icon name="search" size={24} type="font-awesome" />,
+            }}
+          />
+          <Tab.Screen
+            name="History"
+            component={HistoryStack}
+            options={{
+              unmountOnBlur: true,
 
-          }}
-        />
-        <Tab.Screen
-          name="Scanner"
-          component={ScannerStack}
-          options={{
-            tabBarLabel: "Scanner",
-            tabBarIcon: () => <Icon name="search" size={24} type="font-awesome" />,
-          }}
-        />
-
-        <Tab.Screen
-          name="History"
-          component={HistoryStack}
-          options={{
-            tabBarBadge: 1,
-            tabBarLabel: 'Historique',
-            tabBarIcon: () => <Icon name="history" size={24} type="font-awesome" />,
-          }}
-        />
-      </Tab.Navigator>
-    </NavigationContainer>
+              tabBarLabel: 'Historique',
+              tabBarIcon: () => <Icon name="history" size={24} type="font-awesome" />,
+            }}
+          />
+        </Tab.Navigator>
+      </NavigationContainer>
+    </ApplicationProvider>
   );
 
 }

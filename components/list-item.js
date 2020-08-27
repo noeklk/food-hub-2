@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, TouchableOpacity, Text } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
 import { ListItem as ReactListItem } from "react-native-elements";
 
-import GradeRender from "./grade-render";
+import { badgeRender } from "../helpers/grade-helper";
 
 const ListItem = (props) => {
 
@@ -21,12 +21,15 @@ const ListItem = (props) => {
         <View>
             <TouchableOpacity onPress={() => _onPress(item)}>
                 <ReactListItem
-                    leftAvatar={{ source: { uri: item.image_small_url }, size: "large" }}
+                    pad={30}
+                    leftAvatar={{ source: { uri: item.image_url }, size: "large" }}
                     title={item.product_name}
-                    subtitle={<GradeRender size={14} grade={item.grade} />}
                     bottomDivider
                     chevron
-                />
+                    badge={badgeRender(item.grade)}
+                    titleStyle={{ fontSize: 14 }}
+                >
+                </ReactListItem>
             </TouchableOpacity>
         </View>
     )

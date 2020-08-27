@@ -1,9 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { AsyncStorage, SafeAreaView, FlatList, Button } from "react-native";
+import { AsyncStorage, SafeAreaView, FlatList } from "react-native";
+import { Button } from 'react-native-elements';
 import ListItem from "../components/list-item";
 
 const History = (props) => {
     const [history, setHistory] = useState([]);
+
+    const getCacheData = async () => await AsyncStorage.getItem("data");
+
+    const _updateHistory = async () => {
+        const cacheHistory = await getCacheData();
+        if (cacheHistory == null) return;
+        if (history == cacheHistory) return;
+        setHistory(JSON.parse(cacheHistory));
+    }
 
     useEffect(() => {
         (async () => {
@@ -11,11 +21,9 @@ const History = (props) => {
         })()
     }, [])
 
-    const _updateHistory = async () => {
-        const cacheHistory = await AsyncStorage.getItem("data");
-        if (cacheHistory == null) return;
-        if (history == cacheHistory) return;
-        setHistory(JSON.parse(cacheHistory));
+    const clearCache = async () => {
+        await AsyncStorage.clear();
+        setHistory([]);
     }
 
     return (
@@ -31,7 +39,7 @@ const History = (props) => {
                     <ListItem item={item} navigation={props.navigation} />
                 }
             />
-            <Button title="Rafraîchir" onPress={async () => await _updateHistory()} />
+            <Button title="Vider mon historique" onPress={async () => await clearCache()} />
         </SafeAreaView>
     );
 }

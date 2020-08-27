@@ -14,7 +14,7 @@ export async function fetchDataByBarCode(barCode) {
             status: responseJson.status,
             code: responseJson.code,
             product_name: product.product_name,
-            image_small_url: product.image_small_url,
+            image_url: product.image_url,
             grade: product.nutrition_grade_fr
         }
 
@@ -30,7 +30,7 @@ function getTwoRandomLetters() {
     let result = "";
 
     for (var i = 0; i < 2; i++) {
-        result += chars[Math.floor(Math.random() * 26)];
+        result += chars[Math.floor(Math.random() * chars.length)];
     }
 
     return result;
@@ -55,11 +55,15 @@ export async function fetchFiveRandomProducts(pageSize = MAX_PRODUCT_RESULT) {
             for (let i = 0; i < MAX_PRODUCT_RESULT; i++) {
                 if (responseJson.products.length < MAX_PRODUCT_RESULT) { break; }
 
-                if (responseJson.products[i].product_name != null && responseJson.products[i].image_small_url != null) {
-                    validCase += 1;
-                } else {
+                if (responseJson.products[i].product_name == null || responseJson.products[i].image_url == null ||
+                    responseJson.products[i].product_name == undefined || responseJson.products[i].image_url == undefined ||
+                    responseJson.products[i].product_name === "" || responseJson.products[i].image_url === "" ||
+                    !responseJson.products[i].countries.includes("France")) {
+
                     validCase = 0;
                     break;
+                } else {
+                    validCase += 1;
                 }
             }
 
@@ -77,7 +81,7 @@ export async function fetchFiveRandomProducts(pageSize = MAX_PRODUCT_RESULT) {
             id: products[i].id,
             code: products[i].code,
             product_name: products[i].product_name,
-            image_small_url: products[i].image_small_url,
+            image_url: products[i].image_url,
             grade: products[i].nutrition_grade_fr
         });
     }

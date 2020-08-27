@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { SafeAreaView, FlatList, ActivityIndicator, View, Text, Button } from 'react-native';
+import { SafeAreaView, FlatList, ActivityIndicator, View } from 'react-native';
+import { Text, Button } from 'react-native-elements';
 
 import ListItem from "../components/list-item";
 
@@ -29,7 +30,9 @@ const Home = (props) => {
             flexDirection: 'column',
             justifyContent: 'flex-end'
         }}>
-            <Text style={{ textAlign: "center", fontSize: 25, backgroundColor: "#2196F3", color: "white", height: 35 }}>{MAX_PRODUCT_RESULT} produits au hasard à découvrir</Text>
+            <View style={{ backgroundColor: "#2196F3" }}>
+                <Text h4 h4Style={{ fontSize: 23, textAlign: "center", color: "white" }}>{MAX_PRODUCT_RESULT} produits au hasard à découvrir</Text>
+            </View>
             {loading ?
                 <SafeAreaView style={{ flex: 1, padding: 20 }}>
                     <View>
@@ -45,8 +48,7 @@ const Home = (props) => {
                     }
                 />
             }
-
-            <Button title="Rafraîchir" onPress={() => updateHandler()} />
+            <Button title="Actualiser" onPress={() => updateHandler()} />
         </SafeAreaView>
     );
 

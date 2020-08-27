@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Button, AsyncStorage } from "react-native";
+import { View, Text, StyleSheet, AsyncStorage, SafeAreaView, ActivityIndicator } from "react-native";
+import { Button, Icon } from 'react-native-elements';
 import { Camera } from 'expo-camera';
-import { Icon } from 'react-native-elements';
+import { Toggle, Card, Modal } from '@ui-kitten/components';
 
 import { useIsFocused } from '@react-navigation/native';
 
 import { fetchDataByBarCode } from '../services/food-fact';
 import { BarCodeScanner } from "expo-barcode-scanner";
+
+import Svg, { Path } from 'react-native-svg';
 
 const Scanner = (props) => {
 
@@ -15,7 +18,10 @@ const Scanner = (props) => {
     const [product, setProduct] = useState({});
     const [torch, setTorch] = useState(Camera.Constants.FlashMode.off);
     const [notValidProductMessage, setNotValidProductMessage] = useState(null);
-    const [errorMessageToggle, setErrorMessageToggle] = useState(false);
+    const [checked, setChecked] = useState(false);
+    const [isValidScannedProduct, setIsValidScannedProduct] = useState(false);
+
+    const isFocused = useIsFocused();
 
     const torchOff = Camera.Constants.FlashMode.off;
     const torchOn = Camera.Constants.FlashMode.torch;
@@ -23,13 +29,17 @@ const Scanner = (props) => {
     const setTorchOn = () => setTorch(torchOn);
     const torchHandler = () => torch === torchOff ? setTorchOn() : setTorchOff();
 
-    props.navigation.addListener('blur', () => {
-        setTorchOff();
-    });
-
-    const isFocused = useIsFocused();
+    const onCheckedChange = (isChecked) => {
+        torchHandler();
+        setChecked(isChecked);
+    };
 
     const { navigation } = props;
+
+    navigation.addListener('blur', () => {
+        setChecked(false);
+        setTorchOff();
+    });
 
     useEffect(() => {
         (async () => {
@@ -39,29 +49,28 @@ const Scanner = (props) => {
     }, []);
 
     const handleBarCodeScanned = async ({ type, data }) => {
-        setErrorMessageToggle(false);
-        setScanned(true);
-        // alert(`Bar code with type ${type} and data ${data} has been scanned!`);
+        try {
+            const product = await fetchDataByBarCode(data);
+            setScanned(true);
 
-        const product = await fetchDataByBarCode(data);
+            if (product.status === 1) {
+                setIsValidScannedProduct(true);
+                setProduct(product);
+                await storeData(product);
 
-        if (product.status === 1) {
-            setProduct(product);
-            await _storeData(product);
+            } else if (product.status === 0) {
+                setNotValidProductMessage(product.message);
+            } else {
+                setNotValidProductMessage("Erreur non référencé");
 
-        } else if (product.status === 0) {
-            setNotValidProductMessage(product.message);
-            setErrorMessageToggle(true);
-        } else {
+            }
+        } catch (e) {
             setNotValidProductMessage("Erreur non répertorié");
-            setErrorMessageToggle(true);
-        }
 
+        }
     };
 
     const handleViewProduct = () => {
-        setScanned(true);
-
         navigation.navigate('Item',
             {
                 product
@@ -79,7 +88,7 @@ const Scanner = (props) => {
         return true;
     }
 
-    const _storeData = async (inputData) => {
+    const storeData = async (inputData) => {
         try {
             const persistingData = await AsyncStorage.getItem("data");
 
@@ -88,11 +97,11 @@ const Scanner = (props) => {
                 return;
             }
 
-            const jsonParse = JSON.parse(persistingData);
+            const jsonParsePersistingData = JSON.parse(persistingData);
 
-            if (checkDoesNotContainsData(jsonParse, inputData)) {
-                jsonParse.push(inputData);
-                let jsonStringify = JSON.stringify(jsonParse)
+            if (checkDoesNotContainsData(jsonParsePersistingData, inputData)) {
+                jsonParsePersistingData.push(inputData);
+                let jsonStringify = JSON.stringify(jsonParsePersistingData)
 
                 await AsyncStorage.setItem("data", jsonStringify);
             }
@@ -102,50 +111,96 @@ const Scanner = (props) => {
         }
     }
 
+    const resetScan = () => {
+        setScanned(false);
+        setNotValidProductMessage(null);
+        setIsValidScannedProduct(false);
+    }
+
     if (hasPermission === null) {
         return <Text>Requesting for camera permission</Text>;
     }
     if (hasPermission === false) {
         return <Text>No access to camera</Text>;
     }
+    if (!isFocused) {
+        return <SafeAreaView><ActivityIndicator /></SafeAreaView>
+    }
     return (
         <View
             style={{
-                flex: 1,
+                flex: 3,
                 flexDirection: 'column',
-                justifyContent: 'flex-end',
+                justifyContent: "flex-end"
             }}>
-            {isFocused &&
-                <Camera
-                    style={{ flex: 1 }}
-                    type={Camera.Constants.Type.back}
-                    ratio={"16:9"}
-                    flashMode={torch}
-                    onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-                    barCodeScannerSettings={{
-                        barCodeTypes: [BarCodeScanner.Constants.BarCodeType.ean13, BarCodeScanner.Constants.BarCodeType.ean8]
-                    }}
-                    style={StyleSheet.absoluteFillObject}
-                >
+            <Camera
+                style={{ flex: 1 }}
+                type={Camera.Constants.Type.back}
+                ratio={"16:9"}
+                flashMode={torch}
+                onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+                barCodeScannerSettings={{
+                    barCodeTypes: [BarCodeScanner.Constants.BarCodeType.ean13, BarCodeScanner.Constants.BarCodeType.ean8]
+                }}
+                style={StyleSheet.absoluteFillObject}
+            >
+                <View
+                    style={{
+                        display: "flex",
+                        justifyContent: "flex-start",
+                        alignItems: "flex-end",
+                        flexDirection: "column",
+                        margin: 15
+                    }}>
+                    <Toggle checked={checked} onChange={onCheckedChange} />
+                </View>
+                <View
+                    style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignSelf: "center",
+                        top: "20%"
+
+                    }}>
+                    <Svg width="400" height="600">
+                        <Path d="M50,5 h300 a20,20 0 0 1 20,20 v200 a20,20 0 0 1 -20,20 h-300 a20,20 0 0 1 -20,-20 v-200 a20,20 0 0 1 20,-20 z" fill="none" stroke="white" stroke-width="4" />
+                    </Svg>
+                    <Modal visible={notValidProductMessage != null}>
+                        <Card disabled={true}>
+                            <Text>{notValidProductMessage}</Text>
+                            <Button onPress={() => setNotValidProductMessage(null)} title="OK" color="tomato" />
+                        </Card>
+                    </Modal>
+                </View>
+            </Camera>
+            <View style={{
+                display: "flex",
+                width: "100%",
+                flexDirection: "row",
+                justifyContent: "space-evenly",
+                marginBottom: 40
+            }}>
+                {(scanned && isValidScannedProduct) &&
                     <View
-                        style={{
-                            position: "absolute",
-                            width: "25%",
-                            bottom: "15%",
-                            alignSelf: "center"
-                        }}>
-                        <TouchableOpacity
-                            activeOpacity={0.9}
-
-                            onPress={() => torchHandler()}>
-                            <Icon name="flash" backgroundColor={torch === torchOn ? "white" : "rgba(211,211,211, 0.4);"} borderRadius={50} size={100} type="font-awesome" />
-                        </TouchableOpacity>
+                        style={{ width: "40%" }}>
+                        <Button
+                            type="solid"
+                            title={"Voir le produit scanné"}
+                            onPress={() => handleViewProduct()}
+                        />
                     </View>
-                </Camera>}
-
-            {(scanned && !errorMessageToggle) && <Button title={"Voir le produit scanné"} onPress={() => handleViewProduct(false)} />}
-            {scanned && <Button title={"Appuyer pour scanner encore"} onPress={() => setScanned(false)} />}
-            {(errorMessageToggle && scanned) && <Button disabled={true} title={notValidProductMessage} color="tomato" onPress={() => setScanned(false)} />}
+                }
+                {scanned &&
+                    <View
+                        style={{ width: "40%" }}>
+                        <Button
+                            type="solid"
+                            title=" Recommencer le scan"
+                            onPress={() => resetScan()}
+                        />
+                    </View>
+                }
+            </View>
         </View>
     );
 
