@@ -1,3 +1,19 @@
+export const MAX_PRODUCT_RESULT = 10;
+
+const propertyExists = (input) => {
+    if (input == null || input == undefined || input === "") return false;
+
+    return true;
+}
+
+const productIsFromFrance = (input) => {
+    return input.includes("France") ? true : false;
+}
+
+const getPreferredProductName = (product_name, product_name_fr) => {
+    return propertyExists(product_name_fr) ? product_name_fr : propertyExists(product_name) ? product_name : "Pas de nom fourni pour ce produit";
+}
+
 export async function fetchDataByBarCode(barCode) {
     try {
         const response = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barCode}.json`);
@@ -13,9 +29,11 @@ export async function fetchDataByBarCode(barCode) {
             id: product.id,
             status: responseJson.status,
             code: responseJson.code,
-            product_name: product.product_name,
+            product_name: getPreferredProductName(product.product_name, product.product_name_fr),
+            image_nutrition_url: product.image_nutrition_url,
             image_url: product.image_url,
-            grade: product.nutrition_grade_fr
+            grade: product.nutrition_grade_fr,
+            nova: product.nova_group
         }
 
         return data;
@@ -36,12 +54,10 @@ function getTwoRandomLetters() {
     return result;
 }
 
-export const MAX_PRODUCT_RESULT = 10;
-
 export async function fetchFiveRandomProducts(pageSize = MAX_PRODUCT_RESULT) {
     const dataList = [];
 
-    let products;
+    let validProducts;
     let validCase = 0;
 
     try {
@@ -49,16 +65,18 @@ export async function fetchFiveRandomProducts(pageSize = MAX_PRODUCT_RESULT) {
         // et que les MAX_PRODUCT_RESULT premiers résultat n'ai pas un product_name ou image_small_url de null
         // ps: ce fetch nous retourne obligatoirement au moins MAX_PRODUCT_RESULT
         do {
-            let response = await fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${getTwoRandomLetters()}&search_simple=1&page_size=${pageSize}&json=true`);
-            let responseJson = await response.json();
+            const response = await fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${getTwoRandomLetters()}&search_simple=1&page_size=${pageSize}&json=true`);
+            const responseJson = await response.json();
+            const { products } = responseJson;
 
             for (let i = 0; i < MAX_PRODUCT_RESULT; i++) {
-                if (responseJson.products.length < MAX_PRODUCT_RESULT) { break; }
+                if (products.length < MAX_PRODUCT_RESULT) { break; }
 
-                if (responseJson.products[i].product_name == null || responseJson.products[i].image_url == null ||
-                    responseJson.products[i].product_name == undefined || responseJson.products[i].image_url == undefined ||
-                    responseJson.products[i].product_name === "" || responseJson.products[i].image_url === "" ||
-                    !responseJson.products[i].countries.includes("France")) {
+                if (!propertyExists(products[i].product_name_fr) ||
+                    !propertyExists(products[i].image_url) ||
+                    !propertyExists(products[i].nova_group) ||
+                    !propertyExists(products[i].image_nutrition_url) ||
+                    !productIsFromFrance(products[i].countries)) {
 
                     validCase = 0;
                     break;
@@ -68,7 +86,7 @@ export async function fetchFiveRandomProducts(pageSize = MAX_PRODUCT_RESULT) {
             }
 
             if (validCase == MAX_PRODUCT_RESULT) {
-                products = responseJson.products;
+                validProducts = products;
                 break;
             }
         } while (true);
@@ -78,11 +96,13 @@ export async function fetchFiveRandomProducts(pageSize = MAX_PRODUCT_RESULT) {
 
     for (let i = 0; i < MAX_PRODUCT_RESULT; i++) {
         dataList.push({
-            id: products[i].id,
-            code: products[i].code,
-            product_name: products[i].product_name,
-            image_url: products[i].image_url,
-            grade: products[i].nutrition_grade_fr
+            id: validProducts[i].id,
+            code: validProducts[i].code,
+            product_name: validProducts[i].product_name_fr,
+            image_url: validProducts[i].image_url,
+            image_nutrition_url: validProducts[i].image_nutrition_url,
+            grade: validProducts[i].nutrition_grade_fr,
+            nova: validProducts[i].nova_group
         });
     }
 

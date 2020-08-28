@@ -1,15 +1,31 @@
-import React, { useEffect, useState } from "react";
-import { SafeAreaView, FlatList, ActivityIndicator, View } from 'react-native';
+import React, { useEffect, useState, useLayoutEffect } from "react";
+import { SafeAreaView, FlatList, ActivityIndicator, View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, Button } from 'react-native-elements';
+import { Icon } from 'react-native-elements';
 
 import ListItem from "../components/list-item";
 
 import { fetchFiveRandomProducts, MAX_PRODUCT_RESULT } from "../services/food-fact";
 
-const Home = (props) => {
+const Home = ({ navigation }) => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [update, setUpdate] = useState(false);
+
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            headerRight: () => (
+                <TouchableOpacity style={{ right: 10 }} onPress={() => updateHandler()} >
+                    <Icon
+                        name="md-refresh"
+                        size={30}
+                        style={{ borderRadius: 20, width: 30 }}
+                        type="ionicon"
+                    />
+                </TouchableOpacity>
+            )
+        })
+    })
 
     const updateHandler = () => {
         setUpdate(!update);
@@ -31,12 +47,11 @@ const Home = (props) => {
             justifyContent: 'flex-end'
         }}>
             <View style={{ backgroundColor: "#2196F3" }}>
-                <Text h4 h4Style={{ fontSize: 23, textAlign: "center", color: "white" }}>{MAX_PRODUCT_RESULT} produits au hasard à découvrir</Text>
             </View>
             {loading ?
                 <SafeAreaView style={{ flex: 1, padding: 20 }}>
                     <View>
-                        <ActivityIndicator />
+                        <ActivityIndicator color="blue" />
                     </View>
                 </SafeAreaView>
                 :
@@ -44,11 +59,10 @@ const Home = (props) => {
                     keyExtractor={(item, i) => i.toString()}
                     data={products}
                     renderItem={({ item }) =>
-                        < ListItem item={item} navigation={props.navigation} />
+                        < ListItem item={item} navigation={navigation} />
                     }
                 />
             }
-            <Button title="Actualiser" onPress={() => updateHandler()} />
         </SafeAreaView>
     );
 

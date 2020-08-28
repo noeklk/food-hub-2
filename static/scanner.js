@@ -62,16 +62,14 @@ const Scanner = (props) => {
                 setNotValidProductMessage(product.message);
             } else {
                 setNotValidProductMessage("Erreur non référencé");
-
             }
         } catch (e) {
             setNotValidProductMessage("Erreur non répertorié");
-
         }
     };
 
     const handleViewProduct = () => {
-        navigation.navigate('Item',
+        navigation.navigate('item-details',
             {
                 product
             }
@@ -134,7 +132,6 @@ const Scanner = (props) => {
                 justifyContent: "flex-end"
             }}>
             <Camera
-                style={{ flex: 1 }}
                 type={Camera.Constants.Type.back}
                 ratio={"16:9"}
                 flashMode={torch}
@@ -150,9 +147,15 @@ const Scanner = (props) => {
                         justifyContent: "flex-start",
                         alignItems: "flex-end",
                         flexDirection: "column",
-                        margin: 15
+                        right: 20,
+                        top: 25
                     }}>
-                    <Toggle checked={checked} onChange={onCheckedChange} />
+                    <Toggle checked={checked} onChange={onCheckedChange} >
+                        {evaProps => <Icon {...evaProps} name="ios-flash" size={25} type="ionicon" color="white" />}
+
+
+                    </Toggle>
+
                 </View>
                 <View
                     style={{
@@ -168,7 +171,7 @@ const Scanner = (props) => {
                     <Modal visible={notValidProductMessage != null}>
                         <Card disabled={true}>
                             <Text>{notValidProductMessage}</Text>
-                            <Button onPress={() => setNotValidProductMessage(null)} title="OK" color="tomato" />
+                            <Button onPress={() => setNotValidProductMessage(null)} title="Compris" color="#c62828" />
                         </Card>
                     </Modal>
                 </View>
@@ -182,20 +185,22 @@ const Scanner = (props) => {
             }}>
                 {(scanned && isValidScannedProduct) &&
                     <View
-                        style={{ width: "40%" }}>
+                        style={{ width: "20%" }}>
                         <Button
+                            buttonStyle={{ backgroundColor: "white" }}
+                            icon={<Icon name="md-eye" size={50} type="ionicon" />}
                             type="solid"
-                            title={"Voir le produit scanné"}
                             onPress={() => handleViewProduct()}
                         />
                     </View>
                 }
                 {scanned &&
                     <View
-                        style={{ width: "40%" }}>
+                        style={{ width: "20%" }}>
                         <Button
+                            buttonStyle={{ backgroundColor: "white" }}
+                            icon={<Icon name="md-refresh" size={50} type="ionicon" />}
                             type="solid"
-                            title=" Recommencer le scan"
                             onPress={() => resetScan()}
                         />
                     </View>
