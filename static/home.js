@@ -1,11 +1,10 @@
 import React, { useEffect, useState, useLayoutEffect } from "react";
-import { SafeAreaView, FlatList, ActivityIndicator, View, StyleSheet, TouchableOpacity } from 'react-native';
-import { Text, Button } from 'react-native-elements';
-import { Icon } from 'react-native-elements';
+import { SafeAreaView, FlatList, ActivityIndicator, View, TouchableOpacity } from 'react-native';
+import { Icon, Text } from 'react-native-elements';
 
-import ListItem from "../components/list-item";
+import ListItemCustom from "../components/list-item-custom";
 
-import { fetchFiveRandomProducts, MAX_PRODUCT_RESULT } from "../services/food-fact";
+import { fetchFiveRandomProducts } from "../services/food-fact";
 
 const Home = ({ navigation }) => {
     const [products, setProducts] = useState([]);
@@ -56,17 +55,14 @@ const Home = ({ navigation }) => {
                 </SafeAreaView>
                 :
                 <FlatList
-                    keyExtractor={(item, i) => i.toString()}
                     data={products}
                     renderItem={({ item }) =>
-                        < ListItem item={item} navigation={navigation} />
+                        <ListItemCustom key={item.code} item={item} navigation={navigation} />
                     }
                 />
             }
         </SafeAreaView>
     );
-
-
 }
 
 export default Home;

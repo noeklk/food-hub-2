@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect } from "react";
 import { AsyncStorage, SafeAreaView, FlatList, TouchableOpacity } from "react-native";
 import { Button } from 'react-native-elements';
-import ListItem from "../components/list-item";
+import ListItem from "../components/list-item-custom";
 import { Icon } from 'react-native-elements';
 
 const History = ({ navigation }) => {

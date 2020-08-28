@@ -1,16 +1,8 @@
 import React from "react";
-import { View } from "react-native";
+
 import { Text, Image } from "react-native-elements";
 
-const Nova1 = "../assets/images/nova-group-1.png";
-const Nova2 = "../assets/images/nova-group-2.png";
-const Nova3 = "../assets/images/nova-group-3.png";
-const Nova4 = "../assets/images/nova-group-4.png";
-
 export const badgeRender = (grade, display) => {
-
-
-
     switch (grade) {
         case "a":
             return {
@@ -74,25 +66,25 @@ export const NovaRender = (props) => {
     switch (props.nova) {
         case 1:
             return novaAio(
-                <Image source={require(Nova1)} resizeMode="center" style={imgStyle} />,
+                <Image source={require("../assets/images/nova-group-1.png")} resizeMode="center" style={imgStyle} />,
                 "Aliments non transformés ou transformés minimalement"
             );
 
         case 2:
             return novaAio(
-                <Image source={require(Nova2)} resizeMode="center" style={imgStyle} />,
+                <Image source={require("../assets/images/nova-group-2.png")} resizeMode="center" style={imgStyle} />,
                 "Ingrédients culinaires transformés"
             );
 
         case 3:
             return novaAio(
-                <Image source={require(Nova3)} resizeMode="center" style={imgStyle} />,
+                <Image source={require("../assets/images/nova-group-3.png")} resizeMode="center" style={imgStyle} />,
                 "Aliments transformés"
             );
 
         case 4:
             return novaAio(
-                <Image source={require(Nova4)} resizeMode="center" style={imgStyle} />,
+                <Image source={require("../assets/images/nova-group-4.png")} resizeMode="center" style={imgStyle} />,
                 "Produits alimentaires et boissons ultra-transformés"
             );
 

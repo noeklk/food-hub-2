@@ -1,12 +1,10 @@
 import 'react-native-gesture-handler';
-import * as eva from '@eva-design/eva';
-import React, { useState } from 'react';
-import { StyleSheet, TouchableOpacity, TouchableHighlight } from 'react-native';
+import React from 'react';
+import { StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Icon, Button } from 'react-native-elements';
-import { ApplicationProvider } from '@ui-kitten/components';
+import { Icon } from 'react-native-elements';
 import Home from './static/home';
 import History from './static/history';
 import Scanner from './static/scanner';
@@ -60,38 +58,36 @@ const HistoryStack = () => {
 export default function App() {
 
   return (
-    <ApplicationProvider {...eva} theme={eva.light}>
-      <NavigationContainer>
-        <Tab.Navigator>
-          <Tab.Screen
-            name="Home"
-            component={HomeStack}
-            options={{
-              tabBarLabel: "Accueil",
-              tabBarIcon: () => <Icon name="md-home" size={24} type="ionicon" />,
-            }}
-          />
-          <Tab.Screen
-            name="Scanner"
-            component={ScannerStack}
-            options={{
-              tabBarLabel: "Scanner",
-              tabBarIcon: () => <Icon name="md-qr-scanner" size={24} type="ionicon" />,
-            }}
-          />
-          <Tab.Screen
-            name="History"
-            component={HistoryStack}
-            options={{
-              unmountOnBlur: true,
+    <NavigationContainer>
+      <Tab.Navigator>
+        <Tab.Screen
+          name="Home"
+          component={HomeStack}
+          options={{
+            tabBarLabel: "Accueil",
+            tabBarIcon: () => <Icon name="md-home" size={24} type="ionicon" />,
+          }}
+        />
+        <Tab.Screen
+          name="Scanner"
+          component={ScannerStack}
+          options={{
+            tabBarLabel: "Scanner",
+            tabBarIcon: () => <Icon name="md-qr-scanner" size={24} type="ionicon" />,
+          }}
+        />
+        <Tab.Screen
+          name="History"
+          component={HistoryStack}
+          options={{
+            unmountOnBlur: true,
 
-              tabBarLabel: 'Historique',
-              tabBarIcon: () => <Icon name="history" size={24} type="font-awesome" />,
-            }}
-          />
-        </Tab.Navigator>
-      </NavigationContainer>
-    </ApplicationProvider>
+            tabBarLabel: 'Historique',
+            tabBarIcon: () => <Icon name="history" size={24} type="font-awesome" />,
+          }}
+        />
+      </Tab.Navigator>
+    </NavigationContainer>
   );
 
 }

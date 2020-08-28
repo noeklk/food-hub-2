@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, AsyncStorage, SafeAreaView, ActivityIndicator } from "react-native";
-import { Button, Icon } from 'react-native-elements';
+import { View, Text, StyleSheet, AsyncStorage, SafeAreaView, ActivityIndicator, Modal, Switch } from "react-native";
+import { Button, Icon, Card } from 'react-native-elements';
 import { Camera } from 'expo-camera';
-import { Toggle, Card, Modal } from '@ui-kitten/components';
 
 import { useIsFocused } from '@react-navigation/native';
 
@@ -31,7 +30,7 @@ const Scanner = (props) => {
 
     const onCheckedChange = (isChecked) => {
         torchHandler();
-        setChecked(isChecked);
+        setChecked(previousState => !previousState);
     };
 
     const { navigation } = props;
@@ -144,37 +143,52 @@ const Scanner = (props) => {
                 <View
                     style={{
                         display: "flex",
-                        justifyContent: "flex-start",
-                        alignItems: "flex-end",
-                        flexDirection: "column",
+                        justifyContent: "flex-end",
+                        flexDirection: "row",
                         right: 20,
                         top: 25
                     }}>
-                    <Toggle checked={checked} onChange={onCheckedChange} >
-                        {evaProps => <Icon {...evaProps} name="ios-flash" size={25} type="ionicon" color="white" />}
+                    <Switch value={checked}
+                        onValueChange={onCheckedChange}
+                        ios_backgroundColor="#FFF"
 
-
-                    </Toggle>
-
+                        trackColor={{ false: "#767577", true: "#81b0ff" }}
+                        thumbColor={checked ? "#f5dd4b" : "#f4f3f4"} />
+                    <Icon name="ios-flash" size={25} type="ionicon" color="white" />
                 </View>
                 <View
                     style={{
                         display: "flex",
                         justifyContent: "center",
-                        alignSelf: "center",
-                        top: "20%"
+                        alignItems: "center",
+                        top: "20%",
 
                     }}>
                     <Svg width="400" height="600">
                         <Path d="M50,5 h300 a20,20 0 0 1 20,20 v200 a20,20 0 0 1 -20,20 h-300 a20,20 0 0 1 -20,-20 v-200 a20,20 0 0 1 20,-20 z" fill="none" stroke="white" stroke-width="4" />
                     </Svg>
-                    <Modal visible={notValidProductMessage != null}>
-                        <Card disabled={true}>
-                            <Text>{notValidProductMessage}</Text>
-                            <Button onPress={() => setNotValidProductMessage(null)} title="Compris" color="#c62828" />
-                        </Card>
-                    </Modal>
+
                 </View>
+                <Modal animationType="fade" transparent visible={notValidProductMessage != null}  >
+                    <View style={{
+                        flex: 1,
+                        position: "absolute",
+                        justifyContent: "center",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        top: "34%",
+                        left: "22%",
+                        width: 225,
+                        height: 125,
+                        backgroundColor: "white",
+                        borderRadius: 10
+                    }}>
+                        <Text style={{ marginBottom: 20 }}>{notValidProductMessage}</Text>
+                        <Button onPress={() => setNotValidProductMessage(null)} title="Compris" color="#c62828" />
+                    </View>
+                </Modal>
+
+
             </Camera>
             <View style={{
                 display: "flex",
