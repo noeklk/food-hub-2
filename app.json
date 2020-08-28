@@ -21,6 +21,10 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "android": {
+      "package": "com.darkarrow.foodhub2",
+	  "versionCode": 1
     }
   }
 }
