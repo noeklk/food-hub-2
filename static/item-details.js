@@ -11,17 +11,26 @@ const ItemDetails = ({ route }) => {
 
     return (
         <Card>
-            <Card.Title featuredSubtitle={product.image_url ? null : "Pas d'image fournie pour ce produit"} featuredSubtitleStyle={{ textAlign: "center" }}>
+            <Card.Title>
                 {product.product_name}
             </Card.Title>
-            <Card.Image style={{ backgroundColor: "rgba(255,255,255,1)" }}>
-                <Image source={{ uri: product.image_url }} resizeMode="contain" style={{ width: "auto", height: "100%" }} PlaceholderContent={<ActivityIndicator />} />
-            </Card.Image>
+            {product.image_url ? null :
+                <Card.FeaturedTitle style={{ textAlign: "center", backgroundColor: "lightgrey" }}>
+                    <Text style={{ color: "#232323" }}>Pas d'image fournie pour ce produit</Text>
+                </Card.FeaturedTitle>
+            }
+            {product.image_url ?
+                <Card.Image style={{ backgroundColor: "rgba(255,255,255,1)" }}>
+
+                    <Image source={{ uri: product.image_url }} resizeMode="contain" style={{ width: "auto", height: "100%" }} PlaceholderContent={<ActivityIndicator />} />
+
+                </Card.Image>
+                : null
+            }
             <View style={{ display: "flex", justifyContent: "center", alignItems: "center", paddingBottom: 10, paddingTop: 10 }}>
-                <Badge {...badgeRender(product.grade, "long")} textStyle={{ width: 125, textAlign: "center" }} />
+                <Badge {...badgeRender(product.grade, true)} textStyle={{ width: 125, textAlign: "center" }} />
             </View>
             <Card.Divider />
-            <Text style={{ textAlign: "center", paddingTop: 10, fontSize: 22, textDecorationLine: "underline", width: "100%" }}>Groupe</Text>
             <View style={{ paddingBottom: 20, width: "80%", height: 75, flexDirection: "row", alignItems: "center", justifyContent: "center", marginLeft: "auto", marginRight: "auto" }}>
                 <NovaRender nova={product.nova} />
             </View>

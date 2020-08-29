@@ -2,49 +2,92 @@ import React from "react";
 
 import { Text, Image } from "react-native-elements";
 
-export const badgeRender = (grade, display) => {
+export const badgeRender = (grade, longDisplay) => {
+    const aBadgeStyle = { backgroundColor: "#317D43" };
+    const bBadgeStyle = { backgroundColor: "#93B536" };
+    const cBadgeStyle = { backgroundColor: "#E9C40C" };
+    const dBadgeStyle = { backgroundColor: "#CF7719" };
+    const eBadgeStyle = { backgroundColor: "#BF3119" };
+    const xBadgeStyle = { backgroundColor: "#000000" };
+
+
     switch (grade) {
         case "a":
+            if (longDisplay) {
+                return {
+                    value: "Excellent",
+                    badgeStyle: aBadgeStyle
+                }
+            }
+
             return {
                 value: "A",
-                badgeStyle: { backgroundColor: "#317D43" }
+                badgeStyle: aBadgeStyle
             }
 
         case "b":
+            if (longDisplay) {
+                return {
+                    value: "Bon",
+                    badgeStyle: bBadgeStyle
+                }
+            }
+
             return {
                 value: "B",
-                badgeStyle: { backgroundColor: "#93B536" }
+                badgeStyle: bBadgeStyle
             }
 
         case "c":
+            if (longDisplay) {
+                return {
+                    value: "Passable",
+                    badgeStyle: cBadgeStyle
+                }
+            }
+
             return {
                 value: "C",
-                badgeStyle: { backgroundColor: "#E9C40C" }
+                badgeStyle: cBadgeStyle
             }
 
         case "d":
+            if (longDisplay) {
+                return {
+                    value: "Mauvais",
+                    badgeStyle: dBadgeStyle
+                }
+            }
+
             return {
                 value: "D",
-                badgeStyle: { backgroundColor: "#CF7719" }
+                badgeStyle: dBadgeStyle
             }
 
         case "e":
+            if (longDisplay) {
+                return {
+                    value: "Médiocre",
+                    badgeStyle: eBadgeStyle
+                }
+            }
+
             return {
                 value: "E",
-                badgeStyle: { backgroundColor: "#BF3119" }
+                badgeStyle: eBadgeStyle
             }
 
         default:
-            if (display === "long") {
+            if (longDisplay) {
                 return {
-                    value: "Pas de nutriscore",
-                    badgeStyle: { backgroundColor: "#000000" }
+                    value: "Inconnu",
+                    badgeStyle: xBadgeStyle
                 }
             }
 
             return {
                 value: "X",
-                badgeStyle: { backgroundColor: "#000000" }
+                badgeStyle: xBadgeStyle
             }
 
     }
