@@ -55,9 +55,10 @@ const Home = ({ navigation }) => {
                 </SafeAreaView>
                 :
                 <FlatList
+                    keyExtractor={(item, i) => i.toString()}
                     data={products}
                     renderItem={({ item }) =>
-                        <ListItemCustom key={item.code} item={item} navigation={navigation} />
+                        <ListItemCustom item={item} navigation={navigation} />
                     }
                 />
             }
