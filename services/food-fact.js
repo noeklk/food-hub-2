@@ -1,3 +1,5 @@
+import axios from "axios";
+
 export const MAX_PRODUCT_RESULT = 10;
 
 const propertyExists = (input) => {
@@ -16,19 +18,19 @@ const getPreferredProductName = (product_name, product_name_fr) => {
 
 export async function fetchDataByBarCode(barCode) {
     try {
-        const response = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barCode}.json`);
-        const responseJson = await response.json();
+        const response = await axios.get(`https://world.openfoodfacts.org/api/v0/product/${barCode}.json`, { timeout: 4000 });
+        const { data } = response;
 
-        if (responseJson.status == 0) {
+        if (data.status == 0) {
             return { status: 0, message: "Produit invalide ou n'existe pas" }
         }
 
-        const { product } = responseJson;
+        const { product } = data;
 
-        const data = {
+        const arrangedData = {
             id: product.id,
-            status: responseJson.status,
-            code: responseJson.code,
+            status: data.status,
+            code: data.code,
             product_name: getPreferredProductName(product.product_name, product.product_name_fr),
             image_nutrition_url: product.image_nutrition_url,
             image_url: product.image_url,
@@ -36,7 +38,7 @@ export async function fetchDataByBarCode(barCode) {
             nova: product.nova_group
         }
 
-        return data;
+        return arrangedData;
     }
     catch (error) {
         console.error(error);
@@ -65,9 +67,8 @@ export async function fetchFiveRandomProducts(pageSize = MAX_PRODUCT_RESULT) {
         // et que les MAX_PRODUCT_RESULT premiers résultat n'ai pas un product_name ou image_small_url de null
         // ps: ce fetch nous retourne obligatoirement au moins MAX_PRODUCT_RESULT
         do {
-            const response = await fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${getTwoRandomLetters()}&search_simple=1&page_size=${pageSize}&json=true`);
-            const responseJson = await response.json();
-            const { products } = responseJson;
+            const response = await axios.get(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${getTwoRandomLetters()}&search_simple=1&page_size=${pageSize}&json=true`, { timeout: 4000 });
+            const { products } = response.data;
 
             for (let i = 0; i < MAX_PRODUCT_RESULT; i++) {
                 if (products.length < MAX_PRODUCT_RESULT) { break; }
